@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Sun, Moon, LogOut } from 'lucide-react';
 import adminImg from '../../assets/images/Avanish.jpeg'
 import {
@@ -9,6 +9,7 @@ import {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // To get the current route
   const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
 
   const toggleTheme = () => {
@@ -26,16 +27,18 @@ const AdminDashboard = () => {
   const navLinks = [
     { path: '/admin/dashboard/home', icon: <Home size={18} />, label: 'Dashboard' },
     { path: '/admin/dashboard/users', icon: <Users size={18} />, label: 'Users' },
-    { path: '/admin/dashboard/roles', icon: <Shield size={18} />, label: 'Roles' },
     { path: '/admin/dashboard/categories', icon: <Layers size={18} />, label: 'Categories' },
-    { path: '/admin/dashboard/quizzes', icon: <BookOpen size={18} />, label: 'Quizzes' },
+    { path: '/admin/dashboard/quiz', icon: <BookOpen size={18} />, label: 'Quiz' },
     { path: '/admin/dashboard/questions', icon: <HelpCircle size={18} />, label: 'Questions' },
     { path: '/admin/dashboard/attempts', icon: <BarChart3 size={18} />, label: 'Quiz Attempts' },
     { path: '/admin/dashboard/analytics', icon: <BarChart3 size={18} />, label: 'Analytics' },
     { path: '/admin/dashboard/feedback', icon: <MessageCircle size={18} />, label: 'Feedback' },
     { path: '/admin/dashboard/notifications', icon: <Bell size={18} />, label: 'Notifications' },
-    // { path: '/admin/dashboard/profile', icon: <User size={18} />, label: 'Profile' },
   ];
+
+  const isActiveLink = (path) => {
+    return location.pathname === path ? 'bg-gray-200 dark:bg-gray-700' : '';
+  };
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -48,7 +51,7 @@ const AdminDashboard = () => {
             <div
               key={index}
               onClick={() => navigate(link.path)}
-              className="flex items-center gap-2 p-2 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              className={`flex items-center gap-2 p-2 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${isActiveLink(link.path)}`}
             >
               {link.icon}
               <span>{link.label}</span>
@@ -71,7 +74,7 @@ const AdminDashboard = () => {
         
         {/* Top Navbar */}
         <header className="flex items-center justify-between px-6 py-3 border-b bg-white dark:bg-gray-800 dark:border-gray-700">
-          <h1 className="text-xl font-semibold">Welcome Admin</h1>
+          <h1 className="text-xl font-semibold">Welcome Admin To <span className="font-extrabold dark:text-blue-400">TechSkillPro</span></h1>
           <div className="flex items-center gap-4">
             {/* Theme Toggle */}
             <button

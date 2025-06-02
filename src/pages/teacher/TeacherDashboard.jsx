@@ -18,10 +18,10 @@ const TeacherDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const userId = localStorage.getItem('userID');
+  const userId = sessionStorage.getItem('user');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('authToken');
     if (!token || !userId) {
       navigate('/login', { replace: true });
     } else {
@@ -29,8 +29,8 @@ const TeacherDashboard = () => {
         .get(`http://localhost:5269/api/User/getprofile?userID=${userId}`)
         .then((res) => {
           setUserData(res.data);
-          localStorage.setItem('userName', res.data.name);
-          localStorage.setItem('profileImage', res.data.profileImage);
+          sessionStorage.setItem('userName', res.data.name);
+          sessionStorage.setItem('profileImage', res.data.profileImage);
           setLoading(false);
         })
         .catch((err) => {
@@ -42,7 +42,7 @@ const TeacherDashboard = () => {
   }, [navigate, userId]);
 
   const handleLogout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     navigate('/login', { replace: true });
   };
 

@@ -16,10 +16,13 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
 
-  const userId = localStorage.getItem('userID');
+  const userId = sessionStorage.getItem('user');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('authToken');
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const userId = user?.userID;
+
     if (!token || !userId) {
       navigate('/login', { replace: true });
     } else {
@@ -27,18 +30,19 @@ const StudentDashboard = () => {
         .get(`http://localhost:5269/api/User/getprofile?userID=${userId}`)
         .then((res) => {
           setUserData(res.data);
-          localStorage.setItem('userName', res.data.name);
-          localStorage.setItem('profileImage', res.data.profileImage);
+          sessionStorage.setItem('userName', res.data.name);
+          sessionStorage.setItem('profileImage', res.data.profileImage);
         })
         .catch((err) => {
           console.error('Error Fetching Profile:', err);
-          alert("Could not load profile. Please login again.");
+          navigate('/login', { replace: true }); // fallback if profile API fails
         });
     }
-  }, [navigate, userId]);
+  }, [navigate]);
+
 
   const handleLogout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     navigate('/login', { replace: true });
   };
 

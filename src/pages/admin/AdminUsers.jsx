@@ -21,7 +21,13 @@ const AdminUsers = () => {
     });
 
     const fetchUsers = () => {
-        axios.get("http://localhost:5269/api/Admin/getallusers")
+        const token = sessionStorage.getItem("authToken"); // 🔐 fetch token from storage
+        console.log(token);
+        axios.get("http://localhost:5269/api/Admin/getallusers", {
+            headers: {
+                Authorization: `Bearer ${token}`, // ✅ attach token
+            },
+        })
             .then((res) => {
                 const data = res.data;
                 setUsers(data.$values);
@@ -33,26 +39,36 @@ const AdminUsers = () => {
             });
     };
 
+
+
     useEffect(() => {
         fetchUsers();
     }, []);
 
+    //add user by admin
     const handleAddUser = async () => {
         if (!newUser.fullName || !newUser.email || !newUser.password || !newUser.roleID) {
             toast.error("Please fill in all required fields.");
             return;
         }
 
-        const userPayload = {
-            fullName: newUser.fullName,
-            email: newUser.email,
-            password: newUser.password,
-            roleID: parseInt(newUser.roleID),
-            profileImage: newUser.profileImage || ""
-        };
+        const formData = new FormData();
+        formData.append("FullName", newUser.fullName);
+        formData.append("Email", newUser.email);
+        formData.append("Password", newUser.password);
+        formData.append("RoleID", newUser.roleID);
+
+        if (newUser.profileImage) {
+            formData.append("ProfileImage", newUser.profileImage);
+        }
 
         try {
-            const res = await axios.post("http://localhost:5269/api/Admin/signup", userPayload);
+            const res = await axios.post("http://localhost:5269/api/Admin/signup", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // in case it's protected
+                },
+            });
             toast.success("User added successfully!");
             setShowAddModal(false);
             fetchUsers();
@@ -61,6 +77,7 @@ const AdminUsers = () => {
             toast.error("Failed to add user");
         }
     };
+
 
     const handleEdit = (user) => {
         setSelectedUser(user);
@@ -159,6 +176,8 @@ const AdminUsers = () => {
                         users.map((user, index) => (
                             <tr key={user.userID} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td className="border px-4 py-2 text-center">{index + 1}</td>
+
+                                {/* Handle profile image fallback */}
                                 <td className="border px-4 py-2 text-center">
                                     <img
                                         src={user.profileImage
@@ -168,15 +187,31 @@ const AdminUsers = () => {
                                         className="w-10 h-10 rounded-full object-cover"
                                     />
                                 </td>
-                                <td className="border px-4 py-2 text-gray-800 dark:text-white">{user.fullName}</td>
-                                <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">{user.email}</td>
-                                <td className="border px-4 py-2 text-center text-sm font-medium text-blue-600 dark:text-blue-400">{user.role || 'N/A'}</td>
+
+                                {/* If fullName doesn't exist, fallback to email's prefix or show N/A */}
+                                <td className="border px-4 py-2 text-gray-800 dark:text-white">
+                                    {user.fullName || user.email?.split('@')[0] || 'N/A'}
+                                </td>
+
+                                <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                    {user.email}
+                                </td>
+
+                                <td className="border px-4 py-2 text-center text-sm font-medium text-blue-600 dark:text-blue-400">
+                                    {user.role}
+                                </td>
+
                                 <td className="border px-4 py-2 text-center space-x-2">
-                                    <button onClick={() => handleEdit(user)} className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Edit</button>
-                                    <button onClick={() => handleDelete(user)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Delete</button>
+                                    <button onClick={() => handleEdit(user)} className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                                        Edit
+                                    </button>
+                                    <button onClick={() => handleDelete(user)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))
+
                     )}
                 </tbody>
             </table>
@@ -211,6 +246,14 @@ const AdminUsers = () => {
                             <option value="2">Student</option>
                             <option value="3">Teacher</option>
                         </select>
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                                setNewUser({ ...newUser, profileImage: e.target.files[0] })
+                            }
+                        />
 
                         <div className="flex justify-end gap-2 mt-4">
                             <button onClick={() => setShowAddModal(false)} className="px-4 py-2 bg-gray-400 text-white rounded">Cancel</button>
