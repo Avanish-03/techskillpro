@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { data, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Home,
@@ -136,7 +136,9 @@ const StudentDashboard = () => {
         <header className="flex items-center justify-between bg-white shadow-md px-6 py-4 border-b">
           <h2 className="text-xl font-semibold">Welcome, {userData?.name}</h2>
           <img
-            src={userData?.profileImage || profileImage}
+            src={data.profileImage
+              ? `http://localhost:5269/${data.profileImage}`
+              : "/defaultProfileImage.png"}
             alt="Profile"
             className="w-10 h-10 rounded-full border"
           />
