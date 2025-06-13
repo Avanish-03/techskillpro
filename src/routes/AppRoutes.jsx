@@ -8,6 +8,7 @@ import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentHome from '../pages/student/StudentHome';
 import StudentQuiz from '../pages/student/StudentQuiz';
 import AttemptQuiz from '../pages/student/AttemptQuiz';
+import Attempted from '../pages/student/Attempted';
 import StudentLeaderboard from '../pages/student/StudentLeaderboard';
 import StudentContact from '../pages/student/StudentContact';
 import StudentFeedback from '../pages/student/StudentFeedback';
@@ -25,6 +26,7 @@ import TeacherFeedback from '../pages/teacher/TeacherFeedback';
 import TeacherProfile from '../pages/teacher/TeacherProfile';
 import TeacherSettings from '../pages/teacher/TeacherSettings';
 import TeacherNotification from '../pages/teacher/TeacherNotification';
+import TeacherContact from '../pages/teacher/TeacherContact';
 
 // Admin Components
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -64,6 +66,7 @@ const AppRoutes = () => {
         <Route path="home" element={<StudentHome />} />
         <Route path="quiz" element={<StudentQuiz />} />
         <Route path="quiz/:quizID/attempt/:attemptID" element={<AttemptQuiz />} />
+        <Route path="attempt" element={<Attempted />} />
         <Route path="leaderboard" element={<StudentLeaderboard />} />
         <Route path="contact" element={<StudentContact />} />
         <Route path="feedback" element={<StudentFeedback />} />
@@ -79,10 +82,11 @@ const AppRoutes = () => {
         <Route path="results" element={<TeacherResults />} />
         <Route path="leaderboard" element={<TeacherLeaderboard />} />
         <Route path="categories" element={<TeacherCategories />} />
-        <Route path="feedback" element={<TeacherFeedback />} />
+        <Route path="contact" element={<TeacherContact />} />
         <Route path="profile" element={<TeacherProfile />} />
         <Route path="settings" element={<TeacherSettings />} />
         <Route path="notifications" element={<TeacherNotification />} />
+        <Route path="feedback" element={<TeacherFeedback />} />
       </Route>
     </Routes>
   );

@@ -1,125 +1,126 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const TeacherContact = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const TeacherFeedback = () => {
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [filteredFeedbacks, setFilteredFeedbacks] = useState([]);
+  const [quizTitles, setQuizTitles] = useState([]);
+  const [selectedQuiz, setSelectedQuiz] = useState("All");
+  const [loading, setLoading] = useState(true);
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const teacherId = user?.userID;
 
-    if (!name || !email || !message) {
-      alert("❌ Please fill in all fields.");
+  useEffect(() => {
+    if (!teacherId) {
+      console.error("Teacher ID missing");
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      await axios.post("http://localhost:5269/api/Contact", {
-        Name: name,
-        Email: email,
-        Message: message,
+    axios
+      .get(`http://localhost:5269/api/Feedback/ByTeacher/${teacherId}`)
+      .then((res) => {
+        setFeedbackList(res.data);
+        setFilteredFeedbacks(res.data);
+        const titles = [...new Set(res.data.map((f) => f.quizTitle))];
+        setQuizTitles(titles);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching feedbacks:", err);
+        setLoading(false);
       });
+  }, [teacherId]);
 
-      alert("✅ Your message was sent to the admin!");
-      setName('');
-      setEmail('');
-      setMessage('');
-    } catch (error) {
-      console.error(error);
-      alert("❌ Failed to send message. Try again later.");
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    if (selectedQuiz === "All") {
+      setFilteredFeedbacks(feedbackList);
+    } else {
+      setFilteredFeedbacks(
+        feedbackList.filter((f) => f.quizTitle === selectedQuiz)
+      );
     }
-  };
+  }, [selectedQuiz, feedbackList]);
+
+  const avgRating =
+    filteredFeedbacks.length > 0
+      ? (
+          filteredFeedbacks.reduce((sum, f) => sum + f.rating, 0) /
+          filteredFeedbacks.length
+        ).toFixed(1)
+      : 0;
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center p-6">
-      {/* Header */}
-      {/* <div className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 p-10 text-white text-center rounded-lg shadow-lg"> */}
-        <h2 className="text-4xl font-bold mb-4">Teacher Contact Page</h2>
-        <p className="text-lg">Admins are here to assist you. Feel free to reach out!</p>
-      {/* </div> */}
-
-      {/* Contact Form */}
-      <div className="w-full max-w-4xl mt-10 bg-gray-50 p-8 rounded-lg shadow-md">
-        <h3 className="text-3xl font-semibold text-blue-600 mb-6">Send a Message</h3>
-        <form onSubmit={handleFormSubmit}>
-          {/* Name */}
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 font-medium">Your Name</label>
-            <input
-              type="text"
-              id="name"
-              className="w-full border rounded px-4 py-2 mt-2"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 font-medium">Your Email</label>
-            <input
-              type="email"
-              id="email"
-              className="w-full border rounded px-4 py-2 mt-2"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Message */}
-          <div className="mb-4">
-            <label htmlFor="message" className="block text-gray-700 font-medium">Your Message</label>
-            <textarea
-              id="message"
-              className="w-full border rounded px-4 py-2 mt-2"
-              rows="5"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-            ></textarea>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-2 rounded-lg text-white transition ${isSubmitting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-          >
-            {isSubmitting ? 'Sending...' : 'Send Message'}
-          </button>
-        </form>
+    <div className="min-h-screen bg-white p-8">
+      <div className="mb-6">
+        <h2 className="text-3xl font-bold text-blue-700">
+          📋 Student Feedback for Your Quizzes
+        </h2>
       </div>
 
-      {/* Google Map */}
-      <div className="w-full max-w-6xl mt-10 bg-gray-50 p-8 rounded-lg shadow-md">
-        <h3 className="text-3xl font-semibold text-blue-600 mb-6">Our Location</h3>
-        <div className="w-full h-80">
-          <iframe
-            className="w-full h-full rounded-lg"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3669.197971724413!2d72.83106231518107!3d21.1702409840429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395d3e078d58696d%3A0x7d7f000ee9aab0fd!2sSurat%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1672676901385!5m2!1sen!2sin"
-            title="Surat Location"
-            loading="lazy"
-          ></iframe>
-        </div>
-      </div>
+      {loading ? (
+        <p className="text-center text-gray-500 animate-pulse">Loading...</p>
+      ) : (
+        <>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+            <div>
+              <label className="font-medium mr-2">🎯 Filter by Quiz:</label>
+              <select
+                value={selectedQuiz}
+                onChange={(e) => setSelectedQuiz(e.target.value)}
+                className="border rounded px-3 py-1"
+              >
+                <option>All</option>
+                {quizTitles.map((title, idx) => (
+                  <option key={idx}>{title}</option>
+                ))}
+              </select>
+            </div>
 
-      {/* Footer */}
-      <div className="w-full max-w-6xl mt-10 text-center">
-        <p className="text-lg text-gray-600 mb-4">
-          We'll respond as soon as possible. Thanks for reaching out!
-        </p>
-      </div>
+            <div className="text-xl font-semibold text-indigo-700">
+              ⭐ Average Rating:{" "}
+              <span className="text-yellow-500">{avgRating}</span>/5
+            </div>
+          </div>
+
+          {filteredFeedbacks.length === 0 ? (
+            <p className="text-gray-600 text-center">No feedback available.</p>
+          ) : (
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+              {filteredFeedbacks.map((feedback) => (
+                <div
+                  key={feedback.feedbackID}
+                  className="bg-gray-50 border p-5 rounded-xl shadow-sm"
+                >
+                  <h3 className="text-xl font-semibold text-indigo-600 mb-1">
+                    {feedback.quizTitle}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-2">
+                    From: {feedback.studentName}
+                  </p>
+                  <p className="text-gray-800 italic mb-3">
+                    “{feedback.comments}”
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-yellow-500 text-lg">
+                      {"★".repeat(feedback.rating)}
+                    </span>
+                    <span className="text-gray-400">
+                      {5 - feedback.rating > 0 &&
+                        "☆".repeat(5 - feedback.rating)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(feedback.submittedAt).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
 
-export default TeacherContact;
+export default TeacherFeedback;

@@ -8,7 +8,9 @@ const StudentFeedback = () => {
   const [selectedQuizID, setSelectedQuizID] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  const userID = localStorage.getItem("userID");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userID = user?.userID;
+
 
   useEffect(() => {
     if (userID) {
@@ -68,11 +70,14 @@ const StudentFeedback = () => {
             <option value="">-- Select Quiz --</option>
             {quizList.map((quiz) => (
               <option key={quiz.quizID} value={quiz.quizID}>
-                {quiz.title}
+                {quiz.title
+                  ? `${quiz.title}`
+                  : `Quiz ID: ${quiz.quizID}`}
               </option>
             ))}
           </select>
         </div>
+
 
         {/* Feedback Textarea */}
         <div className="mb-4">

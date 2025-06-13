@@ -62,6 +62,12 @@ const StudentDashboard = () => {
                 : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <FileEdit size={18} /> Quiz
             </NavLink>
+            <NavLink to="/student/dashboard/attempt" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
+              <FileEdit size={18} /> Quiz Attempt
+            </NavLink>
             <NavLink to="/student/dashboard/leaderboard" className={({ isActive }) =>
               isActive
                 ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"

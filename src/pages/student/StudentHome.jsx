@@ -34,17 +34,17 @@ const StudentHome = () => {
           {
             title: "Databases",
             desc: "Assess your SQL skills, relational database knowledge, and normalization concepts.",
-            color: "yellow",
+            color: "green",
           },
           {
             title: "Operating Systems",
             desc: "Dive into OS fundamentals like processes, memory management, and file systems.",
-            color: "indigo",
+            color: "red",
           },
           {
             title: "Web Development",
             desc: "Check your skills in HTML, CSS, JavaScript, React, and modern frontend frameworks.",
-            color: "purple",
+            color: "blue",
           },
         ].map((item, index) => (
           <div
