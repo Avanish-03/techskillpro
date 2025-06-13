@@ -20,6 +20,7 @@ import TeacherHome from '../pages/teacher/TeacherHome';
 import TeacherQuizUpload from '../pages/teacher/TeacherQuizUpload';
 import TeacherResults from '../pages/teacher/TeacherResults';
 import TeacherLeaderboard from '../pages/teacher/TeacherLeaderboard';
+import TeacherCategories from '../pages/teacher/TeacherCategories';
 import TeacherFeedback from '../pages/teacher/TeacherFeedback';
 import TeacherProfile from '../pages/teacher/TeacherProfile';
 import TeacherSettings from '../pages/teacher/TeacherSettings';
@@ -77,6 +78,7 @@ const AppRoutes = () => {
         <Route path="quizupload" element={<TeacherQuizUpload />} />
         <Route path="results" element={<TeacherResults />} />
         <Route path="leaderboard" element={<TeacherLeaderboard />} />
+        <Route path="categories" element={<TeacherCategories />} />
         <Route path="feedback" element={<TeacherFeedback />} />
         <Route path="profile" element={<TeacherProfile />} />
         <Route path="settings" element={<TeacherSettings />} />

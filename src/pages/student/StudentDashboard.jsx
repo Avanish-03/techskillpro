@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { GrWorkshop } from 'react-icons/gr';
 import axios from 'axios';
 import {
@@ -116,7 +116,7 @@ const StudentDashboard = () => {
           <h2 className="text-xl font-semibold">
             Welcome, {userData ? userData.name : 'Loading...'}
           </h2>
-          <img
+          <Link to="/student/dashboard/profile" ><img
             src={
               userData?.profileImage
                 ? `http://localhost:5269${userData.profileImage}`
@@ -124,7 +124,7 @@ const StudentDashboard = () => {
             }
             alt="Profile"
             className="w-12 h-12 rounded-full object-cover"
-          />
+          /></Link>
         </header>
 
         {/* Page Content */}

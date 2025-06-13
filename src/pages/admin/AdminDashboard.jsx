@@ -27,8 +27,8 @@ const AdminDashboard = () => {
   const navLinks = [
     { path: '/admin/dashboard/home', icon: <Home size={18} />, label: 'Dashboard' },
     { path: '/admin/dashboard/users', icon: <Users size={18} />, label: 'Users' },
-    { path: '/admin/dashboard/categories', icon: <Layers size={18} />, label: 'Categories' },
     { path: '/admin/dashboard/quiz', icon: <BookOpen size={18} />, label: 'Quiz' },
+    { path: '/admin/dashboard/categories', icon: <Layers size={18} />, label: 'Categories' },
     // { path: '/admin/dashboard/questions', icon: <HelpCircle size={18} />, label: 'Questions' },
     { path: '/admin/dashboard/attempts', icon: <BarChart3 size={18} />, label: 'Quiz Attempts' },
     { path: '/admin/dashboard/analytics', icon: <BarChart3 size={18} />, label: 'Analytics' },

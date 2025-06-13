@@ -92,7 +92,6 @@ const StudentProfile = () => {
       {/* Header Section */}
       <div className="w-full bg-gradient-to-r my-2 from-blue-400 to-teal-500 p-10 text-white text-center rounded-lg shadow-lg">
         <h2 className="text-4xl font-bold mb-4">My Profile</h2>
-        {/* <p className="text-lg">We're here to help. Reach out with any questions or concerns!</p> */}
       </div>
 
       {/* Modal */}
@@ -129,8 +128,10 @@ const StudentProfile = () => {
           <h2 className="text-2xl font-semibold text-blue-700 mb-2">{profile.name}</h2>
           <p className="text-gray-600"><strong>Role:</strong> {profile.roleId === 2 ? "Student" : "User"}</p>
           <p className="text-gray-600"><strong>Email:</strong> {profile.email}</p>
-          <p className="text-gray-600"><strong>Joined:</strong> {new Date(profile.createdAt).toLocaleDateString()}</p>
-          <p className="text-gray-600 mt-2"><strong>Bio:</strong> {profile.bio || " I am an IT student passionate about technology and programming. I use this platform regularly to prepare for exams, build my skills, and explore real-world projects. I'm committed to continuous learning and aim to become a professional software developer."}</p>
+          {/* <p className="text-gray-600"><strong>Joined:</strong> {new Date(profile.createdAt).toLocaleDateString()}</p> */}
+          <p className="text-gray-600 mt-2">
+            <strong>Bio:</strong> {profile.bio || " I am an IT student passionate about technology and programming. I use this platform regularly to prepare for exams, build my skills, and explore real-world projects. I'm committed to continuous learning and aim to become a professional software developer."}
+          </p>
           
           </div>
       </div>

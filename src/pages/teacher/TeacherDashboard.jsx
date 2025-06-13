@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Settings,
   User,
-  Bell,
+  Layers,
   ChevronLeft,
   ChevronRight,
   LogOut
@@ -74,9 +74,9 @@ const TeacherDashboard = () => {
           <nav className="flex flex-col space-y-4">
             <SidebarLink to="/teacher/dashboard/home" icon={<Home size={18} />} label="Home" collapsed={collapsed} />
             <SidebarLink to="/teacher/dashboard/quizupload" icon={<FilePlus size={18} />} label="Quiz Upload" collapsed={collapsed} />
+            <SidebarLink to="/teacher/dashboard/categories" icon={<Layers size={18} />} label="Categories" collapsed={collapsed} />
             <SidebarLink to="/teacher/dashboard/results" icon={<BarChart size={18} />} label="View Results" collapsed={collapsed} />
             <SidebarLink to="/teacher/dashboard/leaderboard" icon={<Award size={18} />} label="Leaderboard" collapsed={collapsed} />
-            {/* <SidebarLink to="/teacher/dashboard/notifications" icon={<Bell size={18} />} label="Notifications" collapsed={collapsed} /> */}
             <SidebarLink to="/teacher/dashboard/profile" icon={<User size={18} />} label="Profile" collapsed={collapsed} />
             <SidebarLink to="/teacher/dashboard/settings" icon={<Settings size={18} />} label="Settings" collapsed={collapsed} />
             <SidebarLink to="/teacher/dashboard/feedback" icon={<MessageCircle size={18} />} label="Contact with Admin" collapsed={collapsed} />
