@@ -1,29 +1,46 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const StudentContact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here (e.g., send form data to API)
-    alert('Form submitted!');
+    setIsSubmitting(true); // ✅ Set before request
+
+    try {
+      const response = await axios.post("http://localhost:5269/api/Contact", {
+        name: name,
+        email: email,
+        message: message
+      });
+      console.log(response.data);
+
+      alert("✅ Your message was sent to the admin!");
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to send message.\n" + (error?.response?.data || 'Try again later.'));
+    } finally {
+      setIsSubmitting(false); // ✅ Always reset after try/catch
+    }
   };
 
   return (
     <div className="bg-white min-h-screen flex flex-col items-center p-6">
-      {/* Header Section */}
       <div className="w-full bg-gradient-to-r from-blue-400 to-teal-500 p-10 text-white text-center rounded-lg shadow-lg">
         <h2 className="text-4xl font-bold mb-4">Contact Us</h2>
         <p className="text-lg">We're here to help. Reach out with any questions or concerns!</p>
       </div>
 
-      {/* Contact Form Section */}
       <div className="w-full max-w-4xl mt-10 bg-gray-50 p-8 rounded-lg shadow-md">
         <h3 className="text-3xl font-semibold text-blue-600 mb-6">Send us a Message</h3>
         <form onSubmit={handleFormSubmit}>
-          {/* Name Field */}
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700 font-medium">Your Name</label>
             <input
@@ -36,7 +53,6 @@ const StudentContact = () => {
             />
           </div>
 
-          {/* Email Field */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-medium">Your Email</label>
             <input
@@ -49,7 +65,6 @@ const StudentContact = () => {
             />
           </div>
 
-          {/* Message Field */}
           <div className="mb-4">
             <label htmlFor="message" className="block text-gray-700 font-medium">Your Message</label>
             <textarea
@@ -62,21 +77,18 @@ const StudentContact = () => {
             ></textarea>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={isSubmitting}
+            className={`w-full py-2 rounded-lg text-white transition ${isSubmitting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
           >
-            Submit
+            {isSubmitting ? 'Sending...' : 'Submit'}
           </button>
         </form>
       </div>
 
-      {/* Google Map Section */}
       <div className="w-full max-w-6xl mt-10 bg-gray-50 p-8 rounded-lg shadow-md">
         <h3 className="text-3xl font-semibold text-blue-600 mb-6">Our Location</h3>
-
-        {/* Embed Google Map with Surat location */}
         <div className="w-full h-80">
           <iframe
             className="w-full h-full rounded-lg"
@@ -87,10 +99,10 @@ const StudentContact = () => {
         </div>
       </div>
 
-
-      {/* Footer Section */}
       <div className="w-full max-w-6xl mt-10 text-center">
-        <p className="text-lg text-gray-600 mb-4">We're happy to assist you with any questions or issues you may have!</p>
+        <p className="text-lg text-gray-600 mb-4">
+          We're happy to assist you with any questions or issues you may have!
+        </p>
       </div>
     </div>
   );

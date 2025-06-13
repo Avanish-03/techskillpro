@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { data, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { GrWorkshop } from 'react-icons/gr';
 import axios from 'axios';
 import {
   Home,
@@ -10,13 +11,10 @@ import {
   Settings,
   LogOut
 } from 'lucide-react';
-import profileImage from '../../assets/images/defaultProfileImage.png';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-
-  const userId = sessionStorage.getItem('user');
 
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -31,15 +29,14 @@ const StudentDashboard = () => {
         .then((res) => {
           setUserData(res.data);
           sessionStorage.setItem('userName', res.data.name);
-          sessionStorage.setItem('profileImage', res.data.profileImage);
+          sessionStorage.setItem('profileImage', `http://localhost:5269${res.data.profileImage}`);
         })
         .catch((err) => {
           console.error('Error Fetching Profile:', err);
-          navigate('/login', { replace: true }); // fallback if profile API fails
+          navigate('/login', { replace: true });
         });
     }
   }, [navigate]);
-
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -53,64 +50,46 @@ const StudentDashboard = () => {
         <div className="p-6">
           <div className="text-2xl font-bold mb-10 text-center">🎓 Student Panel</div>
           <nav className="flex flex-col space-y-3">
-            <NavLink
-              to="/student/dashboard/home"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/home" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <Home size={18} /> Home
             </NavLink>
-            <NavLink
-              to="/student/dashboard/quiz"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/quiz" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <FileEdit size={18} /> Quiz
             </NavLink>
-            <NavLink
-              to="/student/dashboard/contact"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/leaderboard" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
+              <GrWorkshop size={18} /> Leaderboard
+            </NavLink>
+            <NavLink to="/student/dashboard/contact" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <Phone size={18} /> Contact
             </NavLink>
-            <NavLink
-              to="/student/dashboard/feedback"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/feedback" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <MessageCircle size={18} /> Feedback
             </NavLink>
-            <NavLink
-              to="/student/dashboard/profile"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/profile" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <User size={18} /> Profile
             </NavLink>
-            <NavLink
-              to="/student/dashboard/setting"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
-                  : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"
-              }
-            >
+            <NavLink to="/student/dashboard/setting" className={({ isActive }) =>
+              isActive
+                ? "flex items-center gap-3 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg"
+                : "flex items-center gap-3 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-200"}>
               <Settings size={18} /> Settings
             </NavLink>
           </nav>
@@ -134,13 +113,17 @@ const StudentDashboard = () => {
       <div className="ml-64 flex-1 flex flex-col">
         {/* Top Navbar */}
         <header className="flex items-center justify-between bg-white shadow-md px-6 py-4 border-b">
-          <h2 className="text-xl font-semibold">Welcome, {userData?.name}</h2>
+          <h2 className="text-xl font-semibold">
+            Welcome, {userData ? userData.name : 'Loading...'}
+          </h2>
           <img
-            src={data.profileImage
-              ? `http://localhost:5269/${data.profileImage}`
-              : "/defaultProfileImage.png"}
+            src={
+              userData?.profileImage
+                ? `http://localhost:5269${userData.profileImage}`
+                : '/default-profile.png'
+            }
             alt="Profile"
-            className="w-10 h-10 rounded-full border"
+            className="w-12 h-12 rounded-full object-cover"
           />
         </header>
 

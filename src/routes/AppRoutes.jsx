@@ -7,6 +7,8 @@ import ProtectedRoute from './ProtectedRoute';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentHome from '../pages/student/StudentHome';
 import StudentQuiz from '../pages/student/StudentQuiz';
+import AttemptQuiz from '../pages/student/AttemptQuiz';
+import StudentLeaderboard from '../pages/student/StudentLeaderboard';
 import StudentContact from '../pages/student/StudentContact';
 import StudentFeedback from '../pages/student/StudentFeedback';
 import StudentProfile from '../pages/student/StudentProfile';
@@ -29,6 +31,10 @@ import AdminHome from '../pages/admin/AdminHome';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminCategories from '../pages/admin/AdminCategories';
 import AdminQuiz from '../pages/admin/AdminQuiz';
+import AdminAttempts from '../pages/admin/AdminAttempts';
+import AdminAnalytics from '../pages/admin/AdminAnalytics';
+import AdminFeedback from '../pages/admin/AdminFeedback';
+import AdminNotifications from '../pages/admin/AdminNotifications';
 
 const AppRoutes = () => {
   return (
@@ -45,6 +51,10 @@ const AppRoutes = () => {
         <Route path="users" element={<AdminUsers />} />
         <Route path="categories" element={<AdminCategories />} />
         <Route path="quiz" element={<AdminQuiz />} />
+        <Route path="attempts" element={<AdminAttempts />} />
+        <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="feedback" element={<AdminFeedback />} />
+        <Route path="notifications" element={<AdminNotifications />} />
       </Route>
 
       {/* Student Routes */}
@@ -52,6 +62,8 @@ const AppRoutes = () => {
         <Route index element={<StudentHome />} />
         <Route path="home" element={<StudentHome />} />
         <Route path="quiz" element={<StudentQuiz />} />
+        <Route path="quiz/:quizID/attempt/:attemptID" element={<AttemptQuiz />} />
+        <Route path="leaderboard" element={<StudentLeaderboard />} />
         <Route path="contact" element={<StudentContact />} />
         <Route path="feedback" element={<StudentFeedback />} />
         <Route path="profile" element={<StudentProfile />} />

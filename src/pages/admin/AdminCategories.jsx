@@ -19,7 +19,7 @@ const AdminCategories = () => {
         try {
             const response = await axios.get(apiBase);
             console.log("Fetched Categories:", response.data); // Log the response
-            setCategories(response.data.$values);
+            setCategories(response.data);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -146,30 +146,36 @@ const AdminCategories = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {categories.map((cat, index) => (
-                                <tr key={cat.categoryID}>
-                                    <td className="border px-4 py-2">{index + 1}</td> {/* 👈 Row number */}
-                                    <td className="border px-4 py-2">{cat.name}</td>
-                                    <td className="border px-4 py-2">{cat.description}</td>
-                                    <td className="border px-4 py-2">
-                                        {cat.imageURL && (
-                                            <img
-                                                src={`${imageBaseURL}${cat.imageURL}`}
-                                                alt={cat.name}
-                                                className="h-10 w-10 object-cover rounded"
-                                            />
-                                        )}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        <button
-                                            onClick={() => handleDelete(cat.categoryID)}
-                                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                            {Array.isArray(categories) && categories.length > 0 ? (
+                                categories.map((cat, index) => (
+                                    <tr key={cat.categoryID}>
+                                        <td className="border px-4 py-2">{index + 1}</td> {/* 👈 Row number */}
+                                        <td className="border px-4 py-2">{cat.name}</td>
+                                        <td className="border px-4 py-2">{cat.description}</td>
+                                        <td className="border px-4 py-2">
+                                            {cat.imageURL && (
+                                                <img
+                                                    src={`${imageBaseURL}${cat.imageURL}`}
+                                                    alt={cat.name}
+                                                    className="h-10 w-10 object-cover rounded"
+                                                />
+                                            )}
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            <button
+                                                onClick={() => handleDelete(cat.categoryID)}
+                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                                ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center text-gray-600 py-4">No categories found.</td>
                                 </tr>
-                            ))}
+                            )}
 
                         </tbody>
                     </table>

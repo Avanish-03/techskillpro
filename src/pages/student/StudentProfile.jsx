@@ -1,154 +1,138 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt, FaUserCircle } from 'react-icons/fa';
 
 const StudentProfile = () => {
   const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [updatedProfile, setUpdatedProfile] = useState({ name: '', email: '' });
+  const [updatedProfile, setUpdatedProfile] = useState({ name: '', email: '', bio: '', phoneNumber: '', gender: '' });
   const [selectedImage, setSelectedImage] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
 
-  const userID = localStorage.getItem('userID');
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userID = user?.userID;
 
   useEffect(() => {
     if (!userID) return;
-    const fetchProfileData = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5269/api/User/getprofile?userID=${userID}`);
-        setProfile(res.data);
+
+    axios.get(`http://localhost:5269/api/User/getprofile?userID=${userID}`)
+      .then(res => {
+        const data = res.data;
+        setProfile(data);
         setUpdatedProfile({
-          name: res.data.name || '',
-          email: res.data.email || '',
+          name: data.name || '',
+          email: data.email || '',
+          bio: data.bio || '',
+          phoneNumber: data.phoneNumber || '',
+          gender: data.gender || ''
         });
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProfileData();
+        if (data.profileImage) {
+          sessionStorage.setItem('profileImage', data.profileImage);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching profile:", err);
+        alert("Error fetching profile.");
+      });
   }, [userID]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedProfile({ ...updatedProfile, [name]: value });
+    setUpdatedProfile(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setSelectedImage(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setProfileImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("UserId", userID);
-    formData.append("Name", updatedProfile.name);
+    formData.append("UserID", userID);
+    formData.append("FullName", updatedProfile.name);
     formData.append("Email", updatedProfile.email);
+    formData.append("Bio", updatedProfile.bio);
+    formData.append("PhoneNumber", updatedProfile.phoneNumber);
+    formData.append("Gender", updatedProfile.gender);
     if (selectedImage) {
       formData.append("ProfileImage", selectedImage);
     }
 
     try {
-      const response = await axios.put("http://localhost:5269/api/User/updateprofile", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      const res = await axios.put("http://localhost:5269/api/User/updateprofile", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
-      setProfile(response.data);
+
+      setProfile(res.data);
       setIsModalOpen(false);
-    } catch (error) {
-      console.error("Update error:", error);
+      if (res.data.profileImage) {
+        sessionStorage.setItem("profileImage", res.data.profileImage);
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Error updating profile.");
     }
   };
 
-  if (isLoading) return <div className="text-center py-20">Loading profile...</div>;
+  if (!profile) return <div className="text-center mt-10 text-lg">Loading profile...</div>;
+
+  const storedImage = sessionStorage.getItem('profileImage');
+  const profileImage = storedImage
+    ? `http://localhost:5269${storedImage}`
+    : "/images/default-avatar.png";
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header Section */}
+      <div className="w-full bg-gradient-to-r my-2 from-blue-400 to-teal-500 p-10 text-white text-center rounded-lg shadow-lg">
+        <h2 className="text-4xl font-bold mb-4">My Profile</h2>
+        {/* <p className="text-lg">We're here to help. Reach out with any questions or concerns!</p> */}
+      </div>
+
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Update Profile</h3>
-            <form onSubmit={handleProfileUpdate} encType="multipart/form-data">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={updatedProfile.name}
-                  onChange={handleInputChange}
-                  className="w-full mt-2 p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={updatedProfile.email}
-                  onChange={handleInputChange}
-                  className="w-full mt-2 p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Profile Image</label>
-                <input
-                  type="file"
-                  name="ProfileImage"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full mt-2"
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                >
-                  Update
-                </button>
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Edit Profile</h3>
+            <form onSubmit={handleProfileUpdate}>
+              <input type="text" name="name" placeholder="Full Name" value={updatedProfile.name} onChange={handleInputChange} className="w-full mb-3 p-2 border rounded" />
+              <input type="email" name="email" placeholder="Email" value={updatedProfile.email} onChange={handleInputChange} className="w-full mb-3 p-2 border rounded" />
+              <input type="file" accept="image/*" onChange={handleImageChange} className="w-full mb-3" />
+              {profileImagePreview && <img src={profileImagePreview} alt="Preview" className="w-20 h-20 rounded-full object-cover mb-3" />}
+              <div className="flex justify-between">
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:underline">Cancel</button>
               </div>
             </form>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 text-sm text-gray-500 hover:text-gray-700"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
 
       {/* Profile Card */}
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row p-6">
-          {/* Profile Picture */}
-          <div className="relative w-48 h-48 mx-auto md:mx-0 mb-4 md:mb-0">
-            <img
-              src={profile.profileImage || '/default-avatar.png'}  // Added default avatar as fallback
-              alt="Profile"
-              className="w-full h-full object-cover rounded-full border-4 border-blue-500"
-            />
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 md:ml-8 text-center md:text-left">
-            <h2 className="text-2xl font-semibold text-blue-700">{profile.name}</h2>
-            <p className="text-gray-500 mt-1">Student</p>
-            <p className="text-gray-600 mt-2"><strong>Email:</strong> {profile.email}</p>
-            <p className="text-gray-600"><strong>Role ID:</strong> {profile.roleId}</p>
-
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Edit Profile <FaPencilAlt className="inline ml-1" />
-            </button>
-          </div>
+      <div className="max-w-5xl mx-auto bg-white shadow-md rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Image */}
+        <div className="flex flex-col items-center">
+          <img src={profileImage} alt="Profile" className="w-40 h-40 rounded-full border-4 border-blue-500 object-cover" />
+          <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 flex items-center gap-1 text-sm">
+            <FaPencilAlt /> Edit Profile
+          </button>
         </div>
+
+        {/* Details */}
+        <div className="md:col-span-2">
+          <h2 className="text-2xl font-semibold text-blue-700 mb-2">{profile.name}</h2>
+          <p className="text-gray-600"><strong>Role:</strong> {profile.roleId === 2 ? "Student" : "User"}</p>
+          <p className="text-gray-600"><strong>Email:</strong> {profile.email}</p>
+          <p className="text-gray-600"><strong>Joined:</strong> {new Date(profile.createdAt).toLocaleDateString()}</p>
+          <p className="text-gray-600 mt-2"><strong>Bio:</strong> {profile.bio || " I am an IT student passionate about technology and programming. I use this platform regularly to prepare for exams, build my skills, and explore real-world projects. I'm committed to continuous learning and aim to become a professional software developer."}</p>
+          
+          </div>
       </div>
     </div>
   );

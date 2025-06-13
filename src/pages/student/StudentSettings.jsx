@@ -1,61 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Settings = () => {
-  const [email, setEmail] = useState('');
+  const [user, setUser] = useState(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleEmailChange = () => {
-    alert(`Email change requested: ${email}`);
-    // TODO: API call to change email
-  };
+  const userdata = JSON.parse(localStorage.getItem("user"));
+  const userID = userdata?.userID;
+  // console.log(userID);
 
-  const handlePasswordChange = () => {
-    if (newPassword !== confirmPassword) {
-      alert("New passwords do not match.");
+  useEffect(() => {
+    if (!userID || isNaN(userID)) {
+      toast.error("User ID not found. Please log in again.");
       return;
     }
-    alert(`Password change requested.\nCurrent: ${currentPassword}\nNew: ${newPassword}`);
-    // TODO: API call to change password
+
+    axios.get(`http://localhost:5269/api/User/getprofile?userID=${userID}`)
+      .then(res => {
+        setUser(res.data);
+      })
+      .catch(err => {
+        toast.error("Failed to fetch profile.");
+      });
+  }, [userID]);
+
+  const handlePasswordChange = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.warning("Please fill all password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.warning("New passwords do not match.");
+      return;
+    }
+
+    try {
+      await axios.put("http://localhost:5269/api/User/changepassword", {
+        UserID: userID,
+        CurrentPassword: currentPassword,
+        NewPassword: newPassword
+      });
+      toast.success("Password changed successfully!");
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      toast.error(err.response?.data || "Failed to change password.");
+    }
   };
 
-  const handleAccountDelete = () => {
+  const handleAccountDelete = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action is permanent.")) {
-      alert("Account delete requested.");
-      // TODO: API call to delete account
+      try {
+        await axios.delete(`http://localhost:5269/api/User/${userID}`);
+        toast.success("Account deleted.");
+        localStorage.clear();
+        setTimeout(() => window.location.href = '/', 1500);
+      } catch (err) {
+        toast.error("Failed to delete account.");
+      }
     }
   };
 
   return (
-    <div className="mx-auto bg-blue-100 shadow-md rounded-lg p-6 space-y-10">
-      <h2 className="text-2xl font-bold text-blue-800 mb-4">⚙️ Settings</h2>
+    <div className="mx-auto bg-white rounded-lg shadow-md p-6 space-y-10">
+      <ToastContainer position="top-center" autoClose={3000} />
 
-      {/* Email Change Section */}
-      <div>
-        <p className="text-sm text-gray-600 mb-2">
-          Update your registered email address. Make sure it is valid.
-        </p>
-        <label className="block text-gray-700 font-medium mb-2">New Email</label>
-        <input
-          type="email"
-          className="w-full border rounded px-3 py-2"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button
-          onClick={handleEmailChange}
-          className="mt-3 bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
-        >
-          Change Email
-        </button>
-      </div>
+      <h2 className="text-2xl font-bold text-blue-800 mb-4">⚙️ Account Settings</h2>
 
-      {/* Password Change Section */}
+      {/* Password Section */}
       <div>
-        <p className="text-sm text-gray-600 mb-2">
-          Change your account password. Make sure it's strong and easy to remember.
-        </p>
+        <p className="text-sm text-gray-600 mb-2">Change your account password.</p>
 
         <label className="block text-gray-700 font-medium mb-2">Current Password</label>
         <input
@@ -89,7 +109,7 @@ const Settings = () => {
         </button>
       </div>
 
-      {/* Delete Account Section */}
+      {/* Delete Account */}
       <div className="mt-10">
         <p className="text-sm text-red-600 mb-2">
           Permanently delete your account. This action cannot be undone.
