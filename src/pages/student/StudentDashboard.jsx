@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { GrWorkshop } from 'react-icons/gr';
+import img from '../../assets/images/TSP.jpg'
 import axios from 'axios';
 import {
   Home,
@@ -15,6 +16,7 @@ import {
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [showChatbot, setShowChatbot] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -136,8 +138,38 @@ const StudentDashboard = () => {
         {/* Page Content */}
         <main className="flex-1 p-6 bg-gray-50">
           <Outlet context={{ userData }} />
+
         </main>
       </div>
+
+      {/* Conditionally Render Chatbot Iframe */}
+      {
+        showChatbot && (
+          <iframe
+            src="https://www.chatbase.co/chatbot-iframe/vgOc7FZXpowjppac2DaKT"
+            style={{
+              position: 'fixed',
+              bottom: '70px', // above the toggle button
+              right: '20px',
+              width: '350px',
+              height: '500px',
+              border: 'none',
+              zIndex: 9999,
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              borderRadius: '12px',
+            }}
+            title="Student Chatbot"
+          />
+        )
+      }
+      {/* Chatbot Toggle Button */}
+      <button
+        onClick={() => setShowChatbot(!showChatbot)}
+        className="fixed bottom-6 right-6 z-[10000] text-white rounded-full shadow-md"
+      >
+        {showChatbot ? <img src={img} className="h-14 rounded-full" /> : <img src={img}  className="h-14 rounded-full" />}
+      </button>
+
     </div>
   );
 };

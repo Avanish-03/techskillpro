@@ -9,72 +9,97 @@ const AttemptQuiz = () => {
   const [answers, setAnswers] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userID, setUserID] = useState(null);
+  const [duration, setDuration] = useState(0); // duration in seconds
+  const [timeLeft, setTimeLeft] = useState(null);
   const [startTime, setStartTime] = useState(Date.now());
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const userID = user?.userID;
-    if (!userID) {
+    if (!user?.userID) {
       alert("User not logged in");
       navigate("/login");
       return;
     }
-    setUserID(parseInt(userID));
+    setUserID(parseInt(user.userID));
 
-    axios.get(`http://localhost:5269/api/QuizAttempt/${attemptID}/questions`)
-      .then(res => {
-        setQuestions(res.data);
-      })
-      .catch(err => {
-        console.error("Failed to load questions", err);
-        alert("Unable to load questions.");
-      });
-  }, [attemptID]);
+    // Fetch quiz duration and questions
+    const fetchQuizData = async () => {
+      try {
+        const quizRes = await axios.get(`http://localhost:5269/api/Quiz/${quizID}`);
+        const quizDurationInMinutes = quizRes.data.duration;
+        const durationInSeconds = quizDurationInMinutes * 60;
+
+        setDuration(durationInSeconds);
+
+        const questionsRes = await axios.get(
+          `http://localhost:5269/api/QuizAttempt/${attemptID}/questions`
+        );
+        setQuestions(questionsRes.data);
+
+        // ✅ Set start time only after data fetch
+        const now = Date.now();
+        setStartTime(now);
+        setTimeLeft(durationInSeconds); // ⏱ countdown starts here
+      } catch (err) {
+        console.error("Error fetching quiz or questions", err);
+        alert("Failed to load quiz data");
+      }
+    };
+
+
+    fetchQuizData();
+  }, [quizID, attemptID, navigate]);
+
+  useEffect(() => {
+    if (timeLeft === null) return;
+
+    if (timeLeft <= 0) {
+      alert("⏰ Time's up! Auto-submitting your quiz.");
+      handleSubmit();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
 
   const handleOptionChange = (questionID, selectedOption) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionID]: selectedOption
+      [questionID]: selectedOption,
     }));
   };
 
   const handleSubmit = () => {
     const endTime = Date.now();
-    const timeTaken = Math.floor((endTime - startTime) / 1000); // in seconds
-
-    const unanswered = questions.filter(q => !answers.hasOwnProperty(q.questionID));
-    if (unanswered.length > 0) {
-      alert("⚠️ Please answer all questions before submitting the quiz.");
-      return;
-    }
+    const timeTaken = Math.floor((endTime - startTime) / 1000); // this works great
 
     const payload = {
       quizID: parseInt(quizID),
       userID: parseInt(userID),
-      timeTaken: timeTaken,
+      timeTaken,
       startTime: new Date(startTime).toISOString(),
       ipAddress: "127.0.0.1",
       answers: Object.entries(answers).map(([questionID, selectedOption]) => ({
         questionID: parseInt(questionID),
-        selectedAnswer: selectedOption
-      }))
+        selectedAnswer: selectedOption,
+      })),
     };
 
-    console.log("Submitting payload:", payload);
-
-    axios.post("http://localhost:5269/api/QuizAttempt/submit", payload, {
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(res => {
+    axios
+      .post("http://localhost:5269/api/QuizAttempt/submit", payload)
+      .then(() => {
         alert("✅ Quiz submitted successfully!");
-        navigate("/student/dashboard/attempted");
+        navigate("/student/dashboard/attempt");
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Submission failed", err);
         alert("Failed to submit quiz.");
       });
   };
-
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
@@ -88,20 +113,16 @@ const AttemptQuiz = () => {
     }
   };
 
-  const Timer = () => {
-    const [seconds, setSeconds] = useState(0);
-    useEffect(() => {
-      const interval = setInterval(() => setSeconds(prev => prev + 1), 1000);
-      return () => clearInterval(interval);
-    }, []);
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+  const TimerDisplay = () => {
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
     return (
       <div className="text-right text-sm font-medium text-gray-100 mb-4">
-        ⏱️ Time: {mins}:{secs < 10 ? `0${secs}` : secs}
+        ⏱️ Time Left: {mins}:{secs < 10 ? `0${secs}` : secs}
       </div>
     );
   };
+
 
   const q = questions[currentQuestion];
 
@@ -110,13 +131,16 @@ const AttemptQuiz = () => {
       {/* Header with Timer */}
       <div className="w-full max-w-4xl mx-auto mb-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
         <h2 className="text-2xl sm:text-3xl font-bold">🧠 Quiz In Progress</h2>
-        <Timer />
+        {timeLeft !== null && <TimerDisplay />}
       </div>
 
-      {/* Quiz Content Area */}
+      {/* Quiz Content */}
       <div className="flex-grow w-full max-w-4xl mx-auto">
         {q && (
-          <div key={q.questionID} className="p-6 bg-white rounded-3xl shadow-md border border-blue-100 mb-10">
+          <div
+            key={q.questionID}
+            className="p-6 bg-white rounded-3xl shadow-md border border-blue-100 mb-10"
+          >
             <h3 className="text-xl font-semibold text-blue-800 mb-5">
               Q{currentQuestion + 1}. {q.questionText}
             </h3>
@@ -178,7 +202,6 @@ const AttemptQuiz = () => {
         🚀 Stay focused! Choose wisely and give your best. Every second counts.
       </div>
     </div>
-
   );
 };
 

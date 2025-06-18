@@ -27,7 +27,7 @@ const AdminAttempts = () => {
               <th className="px-6 py-3">Student</th>
               <th className="px-6 py-3">Quiz Title</th>
               <th className="px-6 py-3">Score</th>
-              <th className="px-6 py-3">Attempt Date</th>
+              {/* <th className="px-6 py-3">Attempt Date</th> */}
               <th className="px-6 py-3">Status</th>
             </tr>
           </thead>
@@ -50,9 +50,9 @@ const AdminAttempts = () => {
                   <td className="px-6 py-4">{attempt.studentName}</td>
                   <td className="px-6 py-4">{attempt.quizTitle}</td>
                   <td className="px-6 py-4">{attempt.score} / {attempt.totalMarks}</td>
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     {new Date(attempt.attemptDate).toLocaleDateString()}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${

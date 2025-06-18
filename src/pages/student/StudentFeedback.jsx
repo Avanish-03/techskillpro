@@ -68,13 +68,12 @@ const StudentFeedback = () => {
             required
           >
             <option value="">-- Select Quiz --</option>
-            {quizList.map((quiz) => (
+            {[...new Map(quizList.map(q => [q.quizID, q])).values()].map((quiz) => (
               <option key={quiz.quizID} value={quiz.quizID}>
-                {quiz.title
-                  ? `${quiz.title}`
-                  : `Quiz ID: ${quiz.quizID}`}
+                {quiz.title ? quiz.title : `Quiz ID: ${quiz.quizID}`}
               </option>
             ))}
+
           </select>
         </div>
 
