@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { FaUser, FaEnvelope, FaClock, FaCommentDots } from "react-icons/fa";
 
 const AdminFeedback = () => {
   const [messages, setMessages] = useState([]);
@@ -8,9 +9,7 @@ const AdminFeedback = () => {
   useEffect(() => {
     fetch("http://localhost:5269/api/Contact/messages")
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to load data");
-        }
+        if (!res.ok) throw new Error("Failed to load data");
         return res.json();
       })
       .then((data) => {
@@ -25,47 +24,48 @@ const AdminFeedback = () => {
   }, []);
 
   return (
-    <div className="p-6 min-h-screen bg-gradient-to-br from-gray-100 to-blue-50">
-  <h2 className="text-2xl font-bold mb-8 animate-fade-in">📬 Admin Feedback Messages</h2>
+    <div className="min-h-screen p-8 bg-white dark:bg-gray-900">
+      <h2 className="text-3xl font-bold text-blue-700 dark:text-white mb-8">
+        📬 Admin Contact Feedbacks
+      </h2>
 
-  {loading && (
-    <div className="text-center text-gray-600 text-lg animate-pulse">Loading messages...</div>
-  )}
+      {loading ? (
+        <p className="text-center text-gray-500 dark:text-gray-300 animate-pulse">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-500 font-medium">{error}</p>
+      ) : messages.length === 0 ? (
+        <p className="text-center text-gray-600 dark:text-gray-400">No feedback messages found.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-md hover:shadow-xl transition"
+            >
+              <h3 className="text-xl font-semibold text-indigo-600 dark:text-blue-400 mb-2 flex items-center gap-2">
+                <FaUser className="text-blue-500 dark:text-blue-300" />
+                {msg.name}
+              </h3>
 
-  {error && (
-    <div className="text-center text-red-500 text-lg font-medium">{error}</div>
-  )}
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                <FaEnvelope className="text-gray-500" />
+                {msg.email}
+              </p>
 
-  {!loading && !error && messages.length === 0 && (
-    <div className="text-center text-gray-500 text-lg">No feedback messages found.</div>
-  )}
+              <p className="text-gray-800 dark:text-gray-200 italic mb-4 flex gap-2">
+                <FaCommentDots className="mt-1 text-green-500" />
+                “{msg.message}”
+              </p>
 
-  {!loading && !error && messages.length > 0 && (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-      {messages.map((msg) => (
-        <div
-          key={msg.id}
-          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition border border-gray-100"
-        >
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">{msg.name}</h3>
-            <p className="text-sm text-blue-600">{msg.email}</p>
-          </div>
-
-          <div className="mb-4">
-            <p className="text-gray-700 whitespace-pre-line">{msg.message}</p>
-          </div>
-
-          <div className="text-sm text-gray-500 text-right">
-            {msg.sentAt ? new Date(msg.sentAt).toLocaleString() : "N/A"}
-          </div>
+              <div className="text-xs text-right text-gray-500 dark:text-gray-400 flex justify-end items-center gap-1">
+                <FaClock />
+                {msg.sentAt ? new Date(msg.sentAt).toLocaleString() : "N/A"}
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
-  )}
-</div>
-
-
   );
 };
 

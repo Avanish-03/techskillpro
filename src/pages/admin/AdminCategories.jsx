@@ -34,38 +34,38 @@ const AdminCategories = () => {
     };
 
     return (
-        <div className="p-6 h-screen bg-white dark:bg-gray-700 rounded-xl ">
+        <div className="p-6 h-screen bg-white dark:bg-gray-900 rounded-xl ">
             {/* Section for Listing Categories */}
             <div>
-                <h2 className="text-3xl font-bold mb-4 text-gray-700">📚 Manage Categories</h2>
-                <div className="overflow-x-auto rounded-xl shadow-md">
-                    <table className="min-w-full border text-sm">
+                <h2 className="text-3xl font-bold mb-4 dark:text-white text-gray-700">📚 Manage Categories</h2>
+                <div className="overflow-x-auto dark:bg-gray-800  rounded-lg shadow-md">
+                    <table className="min-w-full text-sm">
                         <thead className="bg-gray-200 dark:bg-gray-700 dark:text-white">
                             <tr>
-                                <th className="border px-4 py-2">Sr.no</th>
-                                <th className="border px-4 py-2">Name</th>
-                                <th className="border px-4 py-2">Description</th>
-                                <th className="border px-4 py-2">Image</th>
-                                <th className="border px-4 py-2">Actions</th>
+                                <th className=" px-4 py-2">Sr.no</th>
+                                <th className=" px-4 py-2">Name</th>
+                                <th className=" px-4 py-2">Description</th>
+                                <th className=" px-4 py-2">Image</th>
+                                <th className=" px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {Array.isArray(categories) && categories.length > 0 ? (
                                 categories.map((cat, index) => (
                                     <tr key={cat.categoryID}>
-                                        <td className="border px-4 py-2">{index + 1}</td> {/* 👈 Row number */}
-                                        <td className="border px-4 py-2">{cat.name}</td>
-                                        <td className="border px-4 py-2">{cat.description}</td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border-b px-4 py-2">{index + 1}</td> {/* 👈 Row number */}
+                                        <td className="border-b px-4 py-2">{cat.name}</td>
+                                        <td className="border-b px-4 py-2">{cat.description}</td>
+                                        <td className="border-b px-4 py-2">
                                             {cat.imageURL && (
                                                 <img
                                                     src={`${imageBaseURL}${cat.imageURL}`}
                                                     alt={cat.name}
-                                                    className="h-10 w-10 object-cover rounded"
+                                                    className="h-10  w-10 object-cover rounded"
                                                 />
                                             )}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border-b px-4 py-2">
                                             <button
                                                 onClick={() => handleDelete(cat.categoryID)}
                                                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"

@@ -1,68 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const TeacherResults = () => {
+const TeacherStudentResults = ({ userId: propUserId }) => {
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const userData = JSON.parse(localStorage.getItem("userData"));
-  const teacherId = userData?.userID;
+  // Try to get user from localStorage if userId is not passed as a prop
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = propUserId || user?.userID;
 
   useEffect(() => {
-    if (!teacherId) return;
+    if (userId) {
+      // Optional: Fetch teacher profile for extra info
+      axios
+        .get(`http://localhost:5269/api/User/getprofile?userID=${userId}`)
+        .then((res) => {
+          console.log("Profile Data:", res.data);
+        })
+        .catch((err) => {
+          console.error("Error Fetching Profile:", err);
+        });
 
-    axios
-      .get(`http://localhost:5269/api/Result/byteacher/${teacherId}`)
-      .then((res) => {
-        setResults(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching teacher results:", err);
-        setLoading(false);
-      });
-  }, [teacherId]);
+      // Fetch results created by this teacher
+      axios
+        .get(`http://localhost:5269/api/result/createdby/${userId}/students-results`)
+        .then((res) => {
+          setResults(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching results:", err);
+          setError("No results found or server error.");
+        });
+    } else {
+      setError("User ID is undefined. Cannot fetch results.");
+      console.warn("User ID not found in props or localStorage.");
+    }
+  }, [userId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6">
-      <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-xl p-6">
-        <h1 className="text-3xl font-bold text-blue-700 text-center mb-6">
-          📊 Student Quiz Results
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white py-10 px-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+        <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6">
+          👩‍🏫 Students' Results for My Quizzes
+        </h2>
 
-        {loading ? (
-          <p className="text-center text-gray-600 animate-pulse">Loading...</p>
-        ) : results.length === 0 ? (
-          <p className="text-center text-gray-500">No results found.</p>
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+
+        {results.length === 0 && !error ? (
+          <p className="text-center text-gray-600 text-lg">No results found.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse text-sm md:text-base">
+            <table className="w-full text-left border-collapse rounded-lg">
               <thead>
-                <tr className="bg-blue-100 text-blue-700">
-                  <th className="px-6 py-3 border border-blue-200">Student Name</th>
-                  <th className="px-6 py-3 border border-blue-200">Quiz Title</th>
-                  <th className="px-6 py-3 border border-blue-200">Score (%)</th>
-                  <th className="px-6 py-3 border border-blue-200">Time Taken (min)</th>
+                <tr className="bg-blue-600 text-white text-sm uppercase">
+                  <th className="px-4 py-3">#</th>
+                  <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Quiz</th>
+                  <th className="px-4 py-3 text-center">Obtained</th>
+                  <th className="px-4 py-3 text-center">Total</th>
+                  <th className="px-4 py-3 text-center">Percentage (%)</th>
+                  {/* <th className="px-4 py-3 text-center">Rank</th> */}
                 </tr>
               </thead>
-              <tbody>
-                {results.map((result, index) => (
+              <tbody className="text-gray-800">
+                {results.map((res, index) => (
                   <tr
-                    key={result.resultID || index}
-                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    key={index}
+                    className="border-b hover:bg-gray-50 transition duration-200"
                   >
-                    <td className="px-6 py-3 border border-gray-200 font-medium">
-                      {result.user?.fullName || "N/A"}
-                    </td>
-                    <td className="px-6 py-3 border border-gray-200">
-                      {result.quiz?.title || "N/A"}
-                    </td>
-                    <td className="px-6 py-3 border border-gray-200 text-green-700 font-semibold">
-                      {result.percentage}%
-                    </td>
-                    <td className="px-6 py-3 border border-gray-200 text-gray-600">
-                      {(result.timeTaken / 60).toFixed(1)} min
-                    </td>
+                    <td className="px-4 py-2 font-semibold">{index + 1}</td>
+                    <td className="px-4 py-2">{res.studentName}</td>
+                    <td className="px-4 py-2">{res.quizTitle}</td>
+                    <td className="px-4 py-2 text-center">{res.obtainedMarks}</td>
+                    <td className="px-4 py-2 text-center">{res.totalMarks}</td>
+                    <td className="px-4 py-2 text-center">{res.percentage}%</td>
+                    {/* <td className="px-4 py-2 text-center">{res.rank}</td> */}
                   </tr>
                 ))}
               </tbody>
@@ -74,4 +86,4 @@ const TeacherResults = () => {
   );
 };
 
-export default TeacherResults;
+export default TeacherStudentResults;
