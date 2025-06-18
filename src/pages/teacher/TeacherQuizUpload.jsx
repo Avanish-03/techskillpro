@@ -131,24 +131,24 @@ const TeacherQuizUpload = () => {
     setQuestionData({ ...questionData, [e.target.name]: e.target.value });
   };
   const submitQuestion = async () => {
-  if (!selectedQuiz || !selectedQuiz.quizID) {
-    alert("No quiz selected!");
-    return;
-  }
+    if (!selectedQuiz || !selectedQuiz.quizID) {
+      alert("No quiz selected!");
+      return;
+    }
 
-  try {
-    await axios.post('http://localhost:5269/api/Question', {
-      ...questionData,
-      quizID: selectedQuiz.quizID,
-    });
-    fetchQuestionsForQuiz(selectedQuiz.quizID);
-    fetchQuizzes(userEmail);
-    resetQuestionData();
-  } catch (error) {
-    console.error('Failed to add question:', error);
-    alert('Failed to add question');
-  }
-};
+    try {
+      await axios.post('http://localhost:5269/api/Question', {
+        ...questionData,
+        quizID: selectedQuiz.quizID,
+      });
+      fetchQuestionsForQuiz(selectedQuiz.quizID);
+      fetchQuizzes(userEmail);
+      resetQuestionData();
+    } catch (error) {
+      console.error('Failed to add question:', error);
+      alert('Failed to add question');
+    }
+  };
 
   const fetchQuestionsForQuiz = async (quizID) => {
     try {
@@ -184,15 +184,15 @@ const TeacherQuizUpload = () => {
   //   setShowQuestionModal(true);
   // };
   const handleManageQuestions = (quiz) => {
-  setSelectedQuiz(quiz);
-  setQuestionData(prev => ({
-    ...prev,
-    quizID: quiz.quizID, // ✅ Ensure this line exists
-    sequence: 1           // Optional: reset sequence
-  }));
-  fetchQuestionsForQuiz(quiz.quizID);
-  setShowQuestionModal(true);
-};
+    setSelectedQuiz(quiz);
+    setQuestionData(prev => ({
+      ...prev,
+      quizID: quiz.quizID, // ✅ Ensure this line exists
+      sequence: 1           // Optional: reset sequence
+    }));
+    fetchQuestionsForQuiz(quiz.quizID);
+    setShowQuestionModal(true);
+  };
 
 
   const publishQuiz = (quizId, publish) => {
@@ -200,7 +200,7 @@ const TeacherQuizUpload = () => {
       .patch(`http://localhost:5269/api/Quiz/publish/${quizId}?publish=${publish}`)
       .then(() => {
         // toast.success(publish ? "Quiz Published!" : "Unpublished!");
-        fetchQuizzes(userEmail); 
+        fetchQuizzes(userEmail);
       })
       .catch((error) => {
         console.error("Error publishing quiz:", error.response?.data || error.message);
@@ -231,6 +231,15 @@ const TeacherQuizUpload = () => {
       setQuestionData(prev => ({ ...prev, [field]: transcript }));
     };
   };
+
+  const handleEditQuestion = (questionId) => {
+    toast.info("Edit function not implemented yet.");
+  };
+
+  const handleDeletQuestion = (questionId) => {
+    toast.warn("Delete function not implemented yet.");
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
