@@ -88,7 +88,7 @@ const TeacherCategories = () => {
     };
 
     return (
-        <div className="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-lg">
+        <div className="p-6 bg-white rounded-xl shadow-lg">
             {/* Section for Adding Category */}
             <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-4 text-blue-700">Add New Category</h2>

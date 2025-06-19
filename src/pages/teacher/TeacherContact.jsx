@@ -45,7 +45,7 @@ const TeacherContact = () => {
       </div>
 
       {/* Contact Form */}
-      <div className="w-full max-w-4xl mt-10 bg-gray-50 p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-4xl mt-10 bg-gray-100 p-8 rounded-lg shadow-md">
         <h3 className="text-3xl font-semibold text-blue-600 mb-6">Send a Message</h3>
         <form onSubmit={handleFormSubmit}>
           {/* Name */}
